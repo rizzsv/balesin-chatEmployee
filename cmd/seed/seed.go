@@ -17,12 +17,12 @@ func main() {
 
 	database.Connect()
 
-	hash, _ := security.HashPassword("password123")
+	hash, _ := security.HashPassword("rizq2008")
 
 	_, err := database.DB.Exec(context.Background(), `
 		INSERT INTO users (email, password_hash, role)
 		VALUES ($1, $2, 'admin')
-	`, "admin@company.com", hash)
+	`, "rizq.syafriano@gmail.com", hash)
 
 	if err != nil {
 		log.Fatal(err)

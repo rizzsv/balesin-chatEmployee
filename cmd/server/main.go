@@ -3,6 +3,7 @@ package main
 import (
 	"balesin-chatEmployee/internal/database"
 	"balesin-chatEmployee/internal/handler/http"
+	"balesin-chatEmployee/internal/handler/websocket"
 	"balesin-chatEmployee/internal/middleware"
 	"balesin-chatEmployee/internal/repository"
 	"balesin-chatEmployee/internal/service"
@@ -36,6 +37,8 @@ func main() {
 	authService := service.NewAuthService(userRepo)
 	authHandler := http.NewAuthHandler(authService)
 
+	hub := websocket.NewHub()
+
 	auth.GET("/me", func(c *gin.Context) {
 		userID := c.GetString("user_id")
 		c.JSON(200, gin.H{
@@ -44,6 +47,9 @@ func main() {
 	})
 
 	r.POST("/auth/login", authHandler.Login)
+	r.GET("/ws/chat", func(c *gin.Context) {
+		websocket.ServeWS(hub, c)
+	})
 
 	logger.Log.Info().Msg("========================================")
 	logger.Log.Info().Msg("Server is running successfully!")
