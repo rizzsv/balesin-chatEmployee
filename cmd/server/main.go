@@ -38,6 +38,7 @@ func main() {
 	authHandler := http.NewAuthHandler(authService)
 
 	hub := websocket.NewHub()
+	chatHandler := websocket.NewChatHandler(hub)
 
 	auth.GET("/me", func(c *gin.Context) {
 		userID := c.GetString("user_id")
@@ -47,9 +48,9 @@ func main() {
 	})
 
 	r.POST("/auth/login", authHandler.Login)
-	r.GET("/ws/chat", func(c *gin.Context) {
-		websocket.ServeWS(hub, c)
-	})
+
+	// WebSocket route - JWT validation handled inside
+	r.GET("/ws/chat", chatHandler.HandleChat)
 
 	logger.Log.Info().Msg("========================================")
 	logger.Log.Info().Msg("Server is running successfully!")
