@@ -1,12 +1,13 @@
 package security
 
 import (
+	"errors"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtSecret = []byte("7f8c2a9e4d6b1f3a0c9e8b5d2a4f6c1e9b7a3d5f8e2c4a6b0d1f9e7a3c5")
+var jwtSecret = []byte("SUPER_SECRET_KEY")
 
 func GeneratorToken(userID string) (string, error) {
 	claims := jwt.MapClaims{
@@ -15,4 +16,29 @@ func GeneratorToken(userID string) (string, error) {
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(jwtSecret)
+}
+
+func ParseToken(tokenStr string) (string, error) {
+	token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("unexpected signing method")
+		}
+		return jwtSecret, nil
+	})
+
+	if err != nil || !token.Valid {
+		return "", errors.New("invalid token")
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return "", errors.New("invalid claims")
+	}
+
+	userID, ok := claims["user_id"].(string)
+	if !ok {
+		return "", errors.New("user_id missing")
+	}
+
+	return userID, nil
 }

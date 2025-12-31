@@ -3,6 +3,7 @@ package main
 import (
 	"balesin-chatEmployee/internal/database"
 	"balesin-chatEmployee/internal/handler/http"
+	"balesin-chatEmployee/internal/middleware"
 	"balesin-chatEmployee/internal/repository"
 	"balesin-chatEmployee/internal/service"
 	"balesin-chatEmployee/pkg/logger"
@@ -23,6 +24,9 @@ func main() {
 	logger.Log.Info().Msg("Starting server...")
 	r := gin.Default()
 
+	auth := r.Group("/api")
+	auth.Use(middleware.JWTAuth())
+
 	r.Use(logger.HTTPLogger())
 
 	database.Connect()
@@ -32,9 +36,10 @@ func main() {
 	authService := service.NewAuthService(userRepo)
 	authHandler := http.NewAuthHandler(authService)
 
-	r.GET("/health", func(c *gin.Context) {
+	auth.GET("/me", func(c *gin.Context) {
+		userID := c.GetString("user_id")
 		c.JSON(200, gin.H{
-			"status": "oke",
+			"user_id": userID,
 		})
 	})
 
