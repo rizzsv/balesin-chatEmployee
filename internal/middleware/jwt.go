@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"balesin-chatEmployee/internal/security"
+	"balesin-chatEmployee/internal/shared"
 	"balesin-chatEmployee/pkg/logger"
 
 	"github.com/gin-gonic/gin"
@@ -19,7 +20,7 @@ func JWTAuth() gin.HandlerFunc {
 			return
 		}
 
-				parts := strings.Split(authHeader, " ")
+		parts := strings.Split(authHeader, " ")
 		if len(parts) != 2 || parts[0] != "Bearer" {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"error": "invalid authorization format",
@@ -34,7 +35,7 @@ func JWTAuth() gin.HandlerFunc {
 			return
 		}
 
-		c.Set("userID", userID)
+		c.Set(shared.ContextKeyUserID, userID)
 
 		logger.Log.Info().Str("userID", userID).Msg("JWT authentication successful")
 		c.Next()
