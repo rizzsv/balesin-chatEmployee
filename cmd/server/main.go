@@ -1,0 +1,49 @@
+package main
+
+import (
+	"balesin-chatEmployee/internal/database"
+	"balesin-chatEmployee/internal/handler/http"
+	"balesin-chatEmployee/internal/repository"
+	"balesin-chatEmployee/internal/service"
+	"balesin-chatEmployee/pkg/logger"
+
+	"log"
+
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+)
+
+func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	logger.Init("balesin-chatEmployee")
+
+	logger.Log.Info().Msg("Starting server...")
+	r := gin.Default()
+
+	r.Use(logger.HTTPLogger())
+
+	database.Connect()
+	logger.Log.Info().Msg("Connected to database")
+
+	userRepo := repository.NewUserRepository()
+	authService := service.NewAuthService(userRepo)
+	authHandler := http.NewAuthHandler(authService)
+
+	r.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"status": "oke",
+		})
+	})
+
+	r.POST("/auth/login", authHandler.Login)
+
+	logger.Log.Info().Msg("========================================")
+	logger.Log.Info().Msg("Server is running successfully!")
+	logger.Log.Info().Str("port", "8080").Msg("Listening on http://localhost:8080")
+	logger.Log.Info().Msg("Ready to accept requests")
+	logger.Log.Info().Msg("========================================")
+	r.Run(":8080")
+}
