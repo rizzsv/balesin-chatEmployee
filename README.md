@@ -331,7 +331,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## 👤 Author
 
 **Rizqs**
-- GitHub: [@fizzsv](https://github.com/fizzsv)
+- GitHub: [@rizzsv](https://github.com/rizzsv)
 
 ## 🙏 Acknowledgments
 
@@ -342,4 +342,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-Made with ❤️ using Go
+Love u GO
+
